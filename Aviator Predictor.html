@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>RX PRO PREMIUM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --bg-dark: #050505; --surface-color: #111111; --border-color: #222222;
+            --text-primary: #ffffff; --text-secondary: #888888; --gold-premium: #D4AF37;
+            --pure-green: #00FF00; --light-green: #10b981; --pure-red: #FF0000;
+            --pure-purple: #b026ff; --pure-purple-glow: rgba(176, 38, 255, 0.6); --neon-blue: #00E5FF;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        html, body { 
+            width: 100%; height: 100%; overflow: hidden !important; touch-action: none; overscroll-behavior: none;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at top left, rgba(176, 38, 255, 0.05), transparent 40%),
+                radial-gradient(circle at bottom right, rgba(0, 255, 0, 0.03), transparent 40%);
+            font-family: 'Poppins', sans-serif; color: var(--text-primary);
+        }
+        ::-webkit-scrollbar { display: none; }
+        
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -3; }
+        .bg-image-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://ariyan.online/rxt.jpg') no-repeat center center;
+            background-size: cover; opacity: 0.15; z-index: -2; pointer-events: none;
+        }
+        .starfall-container, .fireflies, .stars-container { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+
+        /* LOADING SCREEN */
+        #loadingPage {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(15px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .loading-logo {
+            width: 120px; height: 120px; border-radius: 50%;
+            box-shadow: 0 0 30px var(--pure-purple-glow);
+            border: 2px solid rgba(255,255,255,0.1);
+            animation: pulse-animation-purple 2s infinite; 
+            margin-bottom: 40px; object-fit: cover;
+        }
+        .loading-percentage {
+            font-family: 'Orbitron', sans-serif; font-size: 45px; font-weight: 900;
+            color: var(--pure-purple); text-shadow: 0 0 20px var(--pure-purple-glow);
+            letter-spacing: 2px; margin-bottom: 20px;
+        }
+        .loading-bar-container {
+            width: 80%; max-width: 300px; height: 8px;
+            background: rgba(255,255,255,0.1); border-radius: 10px;
+            overflow: hidden; box-shadow: inset 0 0 10px rgba(0,0,0,1);
+        }
+        .loading-bar {
+            height: 100%; width: 0%;
+            background: var(--pure-purple);
+            box-shadow: 0 0 15px var(--pure-purple);
+            transition: width 0.04s linear;
+        }
+
+        /* PREMIUM LOGIN SCREENS (STYLES KEPT BUT HTML REMOVED) */
+        .hero-container {
+            background: rgba(10, 10, 10, 0.85); 
+            padding: 30px 20px; border-radius: 24px; 
+            border: 2px solid rgba(255,255,255,0.15); 
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.8), 0 15px 35px rgba(0,0,0,0.7);
+            width: 100%; max-width: 380px; position: relative; margin: auto; max-height: 95vh; overflow-y: auto; touch-action: pan-y;
+        }
+        
+        .brand-title {
+            font-family: 'Orbitron', sans-serif; font-size: 26px; font-weight: 900;
+            background: linear-gradient(to right, #b026ff, #00d2ff); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; text-align: center; margin-bottom: 20px; letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(176, 38, 255, 0.4);
+        }
+        
+        .time-widget { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed rgba(0, 255, 0, 0.2); }
+        .bd-time { display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; color: var(--pure-green); text-shadow: 0 0 12px var(--pure-green); }
+        .bd-time i { color: var(--pure-green); text-shadow: 0 0 12px var(--pure-green); animation: pulse-animation-green 1.5s infinite; }
+        
+        @keyframes pulse-animation-green { 0%, 100% { opacity: 1; text-shadow: 0 0 12px var(--pure-green); } 50% { opacity: 0.5; text-shadow: none; } }
+        @keyframes pulse-animation-purple { 0%, 100% { box-shadow: 0 0 30px var(--pure-purple-glow); } 50% { box-shadow: 0 0 10px rgba(176, 38, 255, 0.2); } }
+
+        .vip-icon-wrapper {
+            position: relative; width: 85px; height: 85px; margin: 0 auto 20px auto; 
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 50%;
+        }
+        .vip-icon-wrapper::before {
+            content: ''; position: absolute; inset: -4px; border-radius: 50%; 
+            background: conic-gradient(#ff0000, #0044ff, #ff0000, #0044ff, #ff0000);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 0);
+            mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 0);
+            animation: premiumSpinCW 3s linear infinite;
+        }
+        .vip-icon-wrapper img { width: 100%; height: 100%; border-radius: 50%; position: relative; z-index: 1; border: 2px solid rgba(255,255,255,0.1); object-fit: cover; }
+
+        .dev-typing-wrapper {
+            margin-top: 25px; margin-bottom: 15px;
+            display: flex; justify-content: center; align-items: center;
+            filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.4));
+        }
+        .typing-text {
+            display: inline-block; font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 900;
+            background: linear-gradient(90deg, #ff0000, #0088ff, #ff0000);
+            background-size: 200% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            border-right: 2px solid var(--pure-red); white-space: nowrap; overflow: hidden; max-width: 0;
+            animation: smoothTyping 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate, blink-caret 0.7s step-end infinite, gradientMove 3s linear infinite;
+            will-change: max-width, background-position;
+        }
+        @keyframes smoothTyping { 0% { max-width: 0; } 100% { max-width: 250px; } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--pure-red); } }
+        @keyframes gradientMove { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+
+        .device-id-box {
+            width: 100%; padding: 18px 20px; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 16px; font-family: 'Orbitron', sans-serif; font-size: 16px; 
+            text-align: center; margin-bottom: 25px; transition: 0.3s; 
+            letter-spacing: 2px; box-shadow: inset 0 2px 10px rgba(0,0,0,1);
+            color: var(--pure-green); text-shadow: 0 0 10px var(--pure-green);
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+        }
+        .device-id-box:hover { border-color: var(--pure-green); box-shadow: 0 0 15px rgba(0, 255, 0, 0.4), inset 0 2px 10px rgba(0,0,0,1); background: rgba(0, 255, 0, 0.05); }
+        .copy-icon { font-size: 22px; transition: 0.3s; color: var(--pure-green); }
+        .device-id-box:hover .copy-icon { animation: bounce 1s infinite; }
+        
+        .input-group input, .login-input {
+            width: 100%; padding: 16px; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 16px; font-family: 'Orbitron', sans-serif; font-size: 16px; 
+            text-align: center; outline: none; margin-bottom: 15px; transition: 0.3s; 
+            letter-spacing: 2px; text-transform: none; box-shadow: inset 0 2px 10px rgba(0,0,0,1);
+            color: #ffffff; text-shadow: none; -webkit-user-select: text; user-select: text;
+        }
+        .input-group input:focus, .login-input:focus { border-color: rgba(255,255,255,0.3); box-shadow: inset 0 2px 10px rgba(0,0,0,1); background: rgba(20, 20, 20, 0.8); }
+        
+        .modal-btn, .btn-premium {
+            width: 100%; padding: 16px; border-radius: 14px; border: none; background: linear-gradient(135deg, #8a2be2, #b026ff); 
+            color: #fff; font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.3s ease; 
+            letter-spacing: 1px; box-shadow: 0 5px 20px var(--pure-purple-glow); display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .modal-btn:hover, .btn-premium:hover { background: linear-gradient(135deg, #b026ff, #d87bff); box-shadow: 0 0 25px var(--pure-purple); transform: translateY(-2px); text-shadow: 0 0 8px #fff; }
+        
+        .submit-btn {
+            width: 100%; padding: 16px; border-radius: 14px; border: none; 
+            background: var(--pure-green); 
+            color: #000; font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 900; 
+            cursor: pointer; transition: all 0.3s ease; letter-spacing: 1px; 
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5); 
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            animation: smoothPulse 2s infinite; 
+        }
+        .submit-btn:hover { background: #00e600; box-shadow: 0 0 25px var(--pure-green); transform: translateY(-2px); }
+        
+        @keyframes smoothPulse {
+            0% { transform: scale(1); box-shadow: 0 0 15px rgba(0, 255, 0, 0.5); }
+            50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(0, 255, 0, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 15px rgba(0, 255, 0, 0.5); }
+        }
+        .btn-order { background: linear-gradient(135deg, #ff0055, #cc0044) !important; box-shadow: 0 5px 20px rgba(255,0,85,0.4) !important; color: #fff !important; border:none !important;}
+        .btn-order:hover { background: linear-gradient(135deg, #ff3377, #ff0055) !important; box-shadow: 0 0 25px #ff0055 !important; }
+        .bounce-anim { animation: bounce 2s infinite; }
+
+        /* CUSTOM NATIVE NEON POPUPS */
+        .custom-neon-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 100000; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 15px; }
+        .custom-neon-popup-overlay.show { display: flex; opacity: 1; }
+        .custom-neon-popup-box { background: #0a0a0a; width: 100%; max-width: 320px; border-radius: 24px; padding: 30px 20px; text-align: center; transform: scale(0.8); transition: 0.3s; box-shadow: 0 25px 60px rgba(0,0,0,1); position:relative; }
+        .custom-neon-popup-overlay.show .custom-neon-popup-box { transform: scale(1); }
+        .custom-neon-popup-icon { font-size: 50px; margin-bottom: 15px; }
+        .custom-neon-popup-title { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 1px; margin-bottom: 15px; word-wrap: break-word;}
+        .custom-neon-popup-message { font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; color: #ccc; margin-bottom: 25px; line-height: 1.5; word-wrap: break-word;}
+        .custom-neon-popup-btn { font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 14px; letter-spacing: 1px; padding: 14px 20px; border-radius: 14px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: #000; width: 100%; }
+        .custom-neon-popup-box.success { border: 2px solid rgba(0, 255, 0, 0.5); box-shadow: inset 0 0 30px rgba(0,255,0,0.15), 0 25px 60px rgba(0,0,0,0.9); }
+        .custom-neon-popup-box.success .custom-neon-popup-icon { color: var(--pure-green); text-shadow: 0 0 20px var(--pure-green); }
+        .custom-neon-popup-box.success .custom-neon-popup-title { color: var(--pure-green); text-shadow: 0 0 15px rgba(0,255,0,0.6); }
+        .custom-neon-popup-box.success .custom-neon-popup-btn { background: linear-gradient(135deg, var(--light-green), var(--pure-green)); box-shadow: 0 5px 20px rgba(0,255,0,0.4); }
+        
+        .custom-neon-popup-box.error { border: 2px solid rgba(255, 0, 0, 0.5); box-shadow: inset 0 0 30px rgba(255,0,0,0.15), 0 25px 60px rgba(0,0,0,0.9); }
+        .custom-neon-popup-box.error .custom-neon-popup-icon { color: var(--pure-red); text-shadow: 0 0 20px var(--pure-red); }
+        .custom-neon-popup-box.error .custom-neon-popup-title { color: var(--pure-red); text-shadow: 0 0 15px rgba(255,0,0,0.6); }
+        .custom-neon-popup-box.error .custom-neon-popup-btn { background: linear-gradient(135deg, #ff4444, #cc0000); color: #fff; box-shadow: 0 5px 20px rgba(255,0,0,0.4); }
+        
+        .toast-alert { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 0, 0, 0.95); color: #fff; padding: 15px 20px; border-radius: 12px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; z-index: 999999; box-shadow: 0 5px 25px rgba(255,0,0,0.8); border: 2px solid #ff4444; display: none; text-align: center; width: 90%; max-width: 320px; white-space: normal; word-wrap: break-word; }
+        .pop-in-center { animation: popInCenter 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popInCenter { 0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+
+        /* MAIN APP STYLES (CLEAR INSIDE) */
+        #mainApp { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: none; padding: 15px; }
+        
+        .app-container {
+            background: rgba(10, 10, 10, 0.95); 
+            border-radius: 28px; padding: 0; 
+            border: 2px solid rgba(255,255,255,0.15); 
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.5), inset 0 0 15px rgba(255,255,255,0.05);
+            width: 100%; max-width: 400px; height: calc(100vh - 30px); margin: 0 auto; position: relative; overflow: hidden;
+        }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px dashed rgba(255, 0, 0, 0.4); background: rgba(0,0,0,0.5); }
+        .live-time { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 800; color: var(--pure-green); text-shadow: 0 0 12px var(--pure-green); display: inline-flex; align-items: center; gap: 8px; }
+        .logout-btn { background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.4); padding: 6px 12px; border-radius: 10px; color: var(--pure-red); font-size: 12px; font-weight: 700; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 6px; }
+        .logout-btn:hover { background: var(--pure-red); color: #fff; box-shadow: 0 0 15px rgba(255,0,0,0.6); }
+        
+        .home-title { font-family: 'Orbitron', sans-serif; font-size: 30px; font-weight: 900; color: var(--pure-red); text-shadow: 0 0 20px rgba(255, 0, 0, 0.6); text-align: center; margin-top: 15px; letter-spacing: 2px; transition: color 0.3s, text-shadow 0.3s; }
+        .crash-mode-active .home-title { color: var(--pure-green); text-shadow: 0 0 20px rgba(0, 255, 0, 0.6); }
+        
+        /* =====================================================================
+           CENTRALIZED SIGNAL RING CONTAINER (Eliminates Wobble/Glitches)
+           ===================================================================== */
+        .ring-container {
+            position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%); 
+            width: 290px; height: 290px; 
+            display: flex; justify-content: center; align-items: center; 
+            z-index: 10;
+        }
+
+        /* OUTER RING (Premium Mode Color, Clockwise) */
+        .glow-scan { 
+            position: absolute; width: 290px; height: 290px; border-radius: 50%; 
+            border: 2px solid rgba(255,0,0,0.2); 
+            border-top: 3px solid var(--pure-red);
+            border-bottom: 3px solid var(--pure-red);
+            box-shadow: 0 0 20px rgba(255,0,0,0.4), inset 0 0 20px rgba(255,0,0,0.2);
+            animation: premiumSpinCW 8s linear infinite; z-index: 1; pointer-events: none;
+            transition: 0.3s;
+        }
+        body.crash-mode-active .glow-scan { 
+            border-color: rgba(0,255,0,0.2); 
+            border-top-color: var(--pure-green);
+            border-bottom-color: var(--pure-green);
+            box-shadow: 0 0 20px rgba(0,255,0,0.4), inset 0 0 20px rgba(0,255,0,0.2);
+        }
+        
+        /* INNER RING (Matching Logo Ring, Counter-Clockwise) */
+        .glow-scan-inner { 
+            position: absolute; width: 268px; height: 268px; border-radius: 50%; 
+            background: conic-gradient(#ff0000, #0044ff, #ff0000, #0044ff, #ff0000);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 0);
+            mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 0);
+            animation: premiumSpinCCW 4s linear infinite; 
+            z-index: 2; pointer-events: none; opacity: 0.9;
+        }
+
+        /* MAIN PORTAL (Inner Signal Box) */
+        .portal { 
+            position: absolute; width: 250px; height: 250px; border-radius: 50%; 
+            background: rgba(5, 5, 5, 0.95); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.6);
+            z-index: 3; transition: 0.3s; 
+        }
+        
+        /* INNER LOGO INSIDE PORTAL */
+        .portal-inner-logo {
+            position: absolute; top: 20px; width: 45px; height: 45px;
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 50%;
+        }
+        .logo-ring {
+            position: absolute; width: 51px; height: 51px; border-radius: 50%;
+            background: conic-gradient(#ff0000, #0044ff, #ff0000, #0044ff, #ff0000);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #fff 0);
+            mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #fff 0);
+            animation: premiumSpinCW 3s linear infinite; z-index: 0;
+        }
+        .portal-inner-logo img { width: 100%; height: 100%; border-radius: 50%; position: relative; z-index: 1; border: 1px solid rgba(255,255,255,0.1); object-fit: cover; }
+
+        .portal .text { font-family: 'Orbitron'; font-size: 55px; color: var(--pure-red); text-shadow: 0 0 20px rgba(255, 0, 0, 0.6); font-weight: 900; transition: 0.3s; letter-spacing: 4px; margin-top: 25px;}
+        body.crash-mode-active .portal .text { color: var(--pure-green); text-shadow: 0 0 20px rgba(0, 255, 0, 0.6); }
+        
+        .mode-indicator { font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 800; color: var(--pure-red); margin-top: 10px; letter-spacing: 3px; transition: 0.3s; text-shadow: 0 0 10px rgba(255,0,0,0.5);}
+        body.crash-mode-active .mode-indicator { color: var(--pure-green); text-shadow: 0 0 10px rgba(0,255,0,0.5);}
+        
+        /* Spin Keyframes */
+        @keyframes premiumSpinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes premiumSpinCCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
+
+        /* BUTTONS AND ACTIONS */
+        .mode-toggle-btn { position: absolute; bottom: 22%; left: 50%; transform: translateX(-50%); width: 220px; padding: 15px; border-radius: 12px; border: none; background: linear-gradient(135deg, #ff0000, #cc0000); color: #fff; font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.3s ease; letter-spacing: 1px; box-shadow: 0 8px 25px rgba(255, 0, 0, 0.4); display: flex; justify-content: center; align-items: center; gap: 8px; z-index: 10; }
+        .mode-toggle-btn.crash-active { background: linear-gradient(135deg, var(--light-green), var(--pure-green)); box-shadow: 0 8px 25px rgba(0, 255, 0, 0.4); color: #000;}
+        .mode-toggle-btn:hover { transform: translateX(-50%) translateY(-2px); filter: brightness(1.2); }
+        
+        .bottom-actions { position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; width: 90%; max-width: 350px; justify-content: center; z-index: 10; }
+        .bottom-actions a, .bottom-actions button { flex: 1; padding: 12px 10px; border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.3s; cursor: pointer; }
+        .btn-dpx { background: linear-gradient(135deg, #b026ff, #6a0dad); color: #fff; border: none; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; box-shadow: 0 0 15px var(--pure-purple-glow); }
+        .btn-dpx:hover { box-shadow: 0 0 25px var(--pure-purple); transform: translateY(-2px); }
+        
+        .contact-sup { background: rgba(0, 136, 204, 0.1); border: 1px solid #0088cc; color: #0088cc; border-radius: 50px !important;}
+        .contact-sup:hover { background: #0088cc; color: #fff; box-shadow: 0 0 20px rgba(0, 136, 204, 0.6); transform: translateY(-2px); }
+        
+        @keyframes signalShake { 0%, 100% { transform: scale(1); } 10%, 30%, 50%, 70%, 90% { transform: scale(1.05) rotate(1deg); } 20%, 40%, 60%, 80% { transform: scale(1.05) rotate(-1deg); } }
+        .signal-active { animation: signalShake 0.5s ease-in-out !important; }
+        
+        /* HARDWARE ACCELERATED ANIMATIONS */
+        .falling-star { 
+            position: absolute; background: #ffd700; 
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); 
+            filter: drop-shadow(0 0 8px #ffd700); opacity: 0.8; 
+            pointer-events: none; z-index: -1;
+            will-change: transform, opacity;
+            transform: translateZ(0); 
+        }
+        @keyframes fallStar { 0% { transform: translateY(-20vh) rotate(0deg); opacity: 0.8; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+        
+        .firefly { 
+            position: absolute; width: 4px; height: 4px; background: var(--pure-red); border-radius: 50%; opacity: 0.8; 
+            animation: rise 8s linear infinite; box-shadow: 0 0 10px var(--pure-red), 0 0 20px var(--pure-red); 
+            will-change: transform, opacity;
+            transform: translateZ(0);
+        }
+        body.crash-mode-active .firefly { background: var(--pure-green); box-shadow: 0 0 10px var(--pure-green), 0 0 20px var(--pure-green); }
+        @keyframes rise { 0% { transform: translateY(0) scale(1); opacity: 0.8; } 100% { transform: translateY(-100vh) scale(0.5); opacity: 0; } }
+        
+        .gold-star { position: absolute; width: 12px; height: 12px; background: #ffd700; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); opacity: 0; filter: drop-shadow(0 0 10px #ffd700); z-index: 20;}
+        .star-animation-1 { animation: starFly1 1.2s ease-out forwards; } .star-animation-2 { animation: starFly2 1.2s ease-out forwards; } .star-animation-3 { animation: starFly3 1.2s ease-out forwards; }
+        @keyframes starFly1 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(150px, -150px) scale(0); opacity: 0; } }
+        @keyframes starFly2 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(-150px, -150px) scale(0); opacity: 0; } }
+        @keyframes starFly3 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(0, 150px) scale(0); opacity: 0; } }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-5px);} 60% {transform: translateY(-3px);} }
+        
+        /* PREMIUM DEVICE ADMIN PANEL UI */
+        .device-item-pro {
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            border-left: 4px solid var(--pure-green);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+        .device-item-pro:hover { border-color: var(--pure-green); box-shadow: 0 0 15px rgba(0,255,0,0.1); }
+        .dev-header { display: flex; justify-content: space-between; align-items: center; }
+        .dev-id-pro { font-family: 'Orbitron'; font-size: 14px; color: #fff; font-weight: bold; letter-spacing: 1px;}
+        .dev-name-pro { font-size: 11px; color: var(--pure-purple); font-weight: bold; background: rgba(176,38,255,0.1); padding: 3px 8px; border-radius: 6px; letter-spacing:0.5px; display:flex; align-items:center;}
+        .dev-stats-row { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; border: 1px dashed #333;}
+        .dev-stats-row span { color: var(--pure-green); font-weight:bold; }
+        .dev-action-row { display: flex; justify-content: flex-end; }
+        
+        .del-dev-btn-pro { background: rgba(255,0,0,0.1); border: 1px solid var(--pure-red); color: var(--pure-red); padding: 6px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:5px;}
+        .del-dev-btn-pro:hover { background: var(--pure-red); color: #fff; box-shadow: 0 0 15px rgba(255,0,0,0.5); }
+        /* DPX Panel Premium Styles */
+        #dpxPage .hero-container { background: rgba(10, 10, 10, 0.95); border: 1px solid var(--pure-purple); box-shadow: 0 0 30px rgba(176,38,255,0.4); }
+
+        /* VIP SWITCH STYLES */
+        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 22px;}
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5);}
+        input:checked + .slider { background-color: var(--pure-green); box-shadow: 0 0 10px var(--pure-green);}
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* 404 FAKE PAGE */
+        #fake404 {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; color: #fff; display: flex; justify-content: center; 
+            align-items: center; z-index: 99999; font-family: monospace; font-size: 20px;
+            text-align: center; cursor: default;
+        }
+    </style>
+</head>
+<body>
+
+<div id="fake404" style="display: none;">
+    <div>404 Not found<br><br>Developer RX</div>
+</div>
+
+<div id="adminLoginScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99998; padding: 15px; background: var(--bg-dark); align-items: center; justify-content: center;">
+    <div class="hero-container" style="max-width: 350px; width: 100%; border-color: var(--pure-red); box-shadow: 0 0 30px rgba(255,0,0,0.3);">
+        <div style="text-align:center; font-family:'Orbitron'; color:var(--pure-red); font-size:24px; font-weight:bold; margin-bottom:20px; text-shadow:0 0 10px var(--pure-red);">
+            <i class="fas fa-user-shield"></i> SYSTEM ACCESS
+        </div>
+        <input type="password" id="adminPassInput" class="login-input" placeholder="Enter Access Key" style="border-color:var(--pure-red);">
+        <button class="submit-btn" style="background:var(--pure-red); color:#fff; box-shadow:0 0 15px rgba(255,0,0,0.5);" onclick="checkAdminPass()"><i class="fas fa-unlock-alt"></i> UNLOCK</button>
+    </div>
+</div>
+
+<div id="loadingPage" style="display: none;">
+    <div class="loading-logo"><img src="https://ariyan.online/rxt.jpg" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"></div>
+    <div class="loading-percentage" id="loadingPercentage">1%</div>
+    <div class="loading-bar-container"><div class="loading-bar" id="loadingBar"></div></div>
+    <div style="margin-top: 20px; font-family: 'Orbitron'; font-size: 12px; color: var(--pure-green); letter-spacing: 3px; animation: pulse-animation-green 1.5s infinite; text-shadow: 0 0 10px var(--pure-green);">INITIALIZING SYSTEM...</div>
+</div>
+
+<div id="customNeonPopup" class="custom-neon-popup-overlay">
+    <div id="customNeonBox" class="custom-neon-popup-box">
+        <div id="customNeonIcon" class="custom-neon-popup-icon"></div>
+        <h2 id="customNeonTitle" class="custom-neon-popup-title"></h2>
+        <div id="customNeonMessage" class="custom-neon-popup-message"></div>
+        <div id="customNeonBtnContainer" style="width: 100%;">
+            <button id="customNeonBtn" class="custom-neon-popup-btn"></button>
+        </div>
+    </div>
+</div>
+
+<div id="dpxPage" class="custom-neon-popup-overlay" style="z-index: 100000; display:none; background: rgba(5,5,5,0.95);">
+    <div class="hero-container" style="max-width: 450px; width: 100%; height: 90vh; display:flex; flex-direction:column;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px dashed var(--pure-purple); padding-bottom:10px; margin-bottom:15px;">
+             <h2 style="font-family:'Orbitron'; color:var(--pure-purple); text-shadow:0 0 10px var(--pure-purple); margin:0;"><i class="fas fa-bolt"></i> DPX PRO</h2>
+             <i class="fas fa-times" style="color:#fff; font-size:20px; cursor:pointer;" onclick="closeDPXPanel()"></i>
+        </div>
+        
+        <div style="background: rgba(176,38,255,0.1); border: 1px solid var(--pure-purple); border-radius:12px; padding:15px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <div style="font-size:12px; color:#aaa;"><i class="fas fa-user-shield"></i> USER</div>
+                <div id="dpxUserName" style="font-family:'Orbitron'; color:#fff; font-weight:700; font-size:16px; margin-top:5px;">Loading...</div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:12px; color:#aaa;"><i class="fas fa-bolt"></i> CREDITS</div>
+                <div id="dpxCredits" style="font-family:'Orbitron'; color:var(--pure-purple); font-weight:900; font-size:22px; text-shadow:0 0 10px var(--pure-purple);">--</div>
+            </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:12px; overflow-y:auto; padding-right:5px;">
+             <button class="modal-btn" onclick="openDPXAction('deposit')"><i class="fas fa-wallet"></i> DEPOSIT</button>
+             <button class="modal-btn" style="background:linear-gradient(135deg, #0088cc, #005580); box-shadow:0 5px 20px rgba(0,136,204,0.4);" onclick="openDPXAction('process')"><i class="fas fa-server"></i> PROCESS</button>
+             <button class="modal-btn" style="background:linear-gradient(135deg, #ff0055, #cc0044); box-shadow:0 5px 20px rgba(255,0,85,0.4);" onclick="openDPXAction('reset')"><i class="fas fa-sync-alt"></i> RESET</button>
+             <button class="modal-btn" style="background:linear-gradient(135deg, #10b981, #00a000); box-shadow:0 5px 20px rgba(0,255,0,0.3); color:#000;" onclick="openDPXAction('balance')"><i class="fas fa-sliders-h"></i> + - BALANCE</button>
+        </div>
+        
+        <div id="dpxActionForm" style="display:none; margin-top:20px; background:rgba(0,0,0,0.6); padding:15px; border-radius:12px; border:1px solid #333;"></div>
+    </div>
+</div>
+
+<canvas id="bg-canvas"></canvas>
+<div class="bg-image-overlay"></div>
+<div class="starfall-container" id="starfallContainer"></div>
+
+<div id="mainApp">
+    <div class="app-container">
+        <div class="top-bar">
+            <div class="live-time" id="liveTime">
+                <i class="fas fa-clock clock-icon"></i>
+                <span id="currentTime">0:00</span>
+                <span id="seconds" class="seconds">:00</span>
+                <span class="time-period" id="timePeriod" style="font-size:12px;">AM</span>
+            </div>
+            
+            <div id="expiryIconBtn" style="display:none; cursor:pointer; color:var(--pure-green); font-size: 22px; animation: pulse-animation-green 1.5s infinite; text-shadow: 0 0 10px var(--pure-green);" onclick="showToastAlert(currentExpiryText)">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-power-off"></i> EXIT</button>
+        </div>
+
+        <div class="home-title">RX PREDICTION</div>
+        
+        <div class="dev-typing-wrapper">
+            <div class="typing-text">Developer: RX ARIYAN KHAN</div>
+        </div>
+        
+        <div class="ring-container">
+            <div class="glow-scan" id="glowScan"></div>
+            
+            <div class="glow-scan-inner" id="glowScanInner"></div>
+            
+            <div class="portal" id="signalPortal">
+                <div class="portal-inner-logo">
+                    <div class="logo-ring"></div>
+                    <img src="https://ariyan.online/rxt.jpg" alt="Logo">
+                </div>
+                
+                <div id="crashValue" class="text">WAIT</div>
+                <div class="mode-indicator" id="currentModeDisplay">AVIATOR</div>
+                <div class="stars-container" id="starsContainer" style="position: absolute; top:50%; left:50%; width:0; height:0;"></div>
+            </div>
+        </div>
+
+        <button id="modeToggleBtn" onclick="toggleMode()" class="mode-toggle-btn">
+            <span id="modeBtnText"><i class="fas fa-exchange-alt"></i> SWITCH TO CRASH</span>
+        </button>
+
+        <div class="bottom-actions">
+            <button id="dpxMainBtn" class="btn-dpx" onclick="openDPXPanel()">
+                <i class="fas fa-bolt"></i> DPX
+            </button>
+            <a href="https://t.me/ariyan99pro" target="_blank" class="contact-sup">
+                <i class="fab fa-telegram-plane"></i> t.me/ariyan99pro
+            </a>
+        </div>
+
+        <div class="fireflies" id="fireflies"></div>
+    </div>
+</div>
+
+<div id="screenDeviceAdmin" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1500; padding: 15px; overflow-y: auto; background: var(--bg-dark); align-items: center; justify-content: center;">
+    <div class="hero-container" style="max-width: 500px; width: 100%; border: 1px solid rgba(0,255,0,0.3); height: 95vh; display:flex; flex-direction:column;">
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px dashed var(--pure-green); padding-bottom:15px; margin-bottom:20px;">
+             <h2 style="font-family:'Orbitron'; color:var(--pure-green); text-shadow:0 0 10px rgba(0,255,0,0.5); margin:0; font-size:20px;"><i class="fas fa-cogs"></i> DEVICE ADMIN</h2>
+             <button onclick="logout()" style="background:none; border:none; color:var(--pure-red); font-size:22px; cursor:pointer;"><i class="fas fa-power-off"></i></button>
+        </div>
+        
+        <div style="flex-shrink: 0;">
+            <div class="input-group">
+                <input type="text" id="adminDeviceId" class="login-input" placeholder="Device ID (e.g. 3RX9A1B2C)">
+            </div>
+            
+            <div style="display:flex; gap:10px;">
+                <div class="input-group" style="flex:1;">
+                    <input type="text" id="adminUserName" class="login-input" placeholder="User Name">
+                </div>
+                <div class="input-group" style="flex:1;">
+                    <input type="number" id="adminCredits" class="login-input" placeholder="Daily Credits">
+                </div>
+            </div>
+
+            <div class="input-group" style="display:flex; align-items:center; justify-content:space-between; padding: 12px 15px; background:rgba(10,10,10,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:16px; margin-bottom:15px;">
+                <span style="font-family:'Orbitron'; color:var(--pure-green); font-size:14px; font-weight:bold; letter-spacing:1px;"><i class="fas fa-crown" style="color:gold;"></i> CRASH VIP SIGNAL</span>
+                <label class="switch">
+                  <input type="checkbox" id="adminCrashVip">
+                  <span class="slider round"></span>
+                </label>
+            </div>
+            
+            <div class="input-group">
+                <div class="options-small" id="validityOptions" style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+                    <div class="method-pill-sm v-pill active" data-val="1d" style="padding:8px 15px; background:var(--pure-green); color:#000; border-radius:8px; cursor:pointer; font-weight:bold; flex:1; text-align:center;">1D</div>
+                    <div class="method-pill-sm v-pill" data-val="2d" style="padding:8px 15px; background:#222; color:#fff; border-radius:8px; cursor:pointer; font-weight:bold; flex:1; text-align:center;">2D</div>
+                    <div class="method-pill-sm v-pill" data-val="3d" style="padding:8px 15px; background:#222; color:#fff; border-radius:8px; cursor:pointer; font-weight:bold; flex:1; text-align:center;">3D</div>
+                    <div class="method-pill-sm v-pill" data-val="custom" style="padding:8px 15px; background:#222; color:#fff; border-radius:8px; cursor:pointer; font-weight:bold; flex:1; text-align:center;">Cust</div>
+                </div>
+                <input type="text" id="customValidityInput" class="login-input" placeholder="Custom Validity (e.g. 5h, 10m, 7d)" style="display:none; margin-top:10px;">
+            </div>
+            
+            <button class="submit-btn" onclick="saveDeviceAccess()" style="margin-top: 5px;"><i class="fas fa-save"></i> SAVE ACCESS</button>
+        </div>
+        
+        <h3 style="margin-top:25px; font-family:'Orbitron'; color:#fff; border-bottom:1px solid #333; padding-bottom:10px; font-size:14px; text-align:left; letter-spacing:1px;"><i class="fas fa-list-ul"></i> APPROVED LIST</h3>
+        
+        <div id="deviceListContainer" style="margin-top:15px; flex-grow:1; display:flex; flex-direction:column; gap:10px; overflow-y:auto; padding-right:5px; padding-bottom:20px;"></div>
+    </div>
+</div>
+
+<script>
+    const getDeviceID = () => {
+        let id = localStorage.getItem('rx_device_id');
+        if (!id) { 
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let randomStr = '';
+            for(let i=0; i<7; i++) randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+            let insertPos = Math.floor(Math.random() * 6) + 1;
+            id = randomStr.slice(0, insertPos) + 'RX' + randomStr.slice(insertPos);
+            localStorage.setItem('rx_device_id', id); 
+        }
+        return id;
+    };
+    const _DEVICE_ID = getDeviceID();
+
+    let currentMode = 'aviator';
+    let isSwitching = false;
+    let _currentSignal = "";
+    let isFetching = false;
+    let signalTimeout = null; 
+    let lastFetchTime = 0;
+    const FETCH_INTERVAL = 1000;
+    let currentExpiryText = "Calculating..."; 
+
+    function logout() { window.location.href = '?logout=true'; }
+
+    // FAKE 404 LOGIC
+    let fake404Clicks = 0;
+    document.getElementById('fake404').addEventListener('click', () => {
+        fake404Clicks++;
+        if(fake404Clicks >= 2) {
+            document.getElementById('fake404').style.display = 'none';
+            document.getElementById('adminLoginScreen').style.display = 'flex';
+        }
+    });
+
+    // ADMIN LOGIN PASS CHECK
+    function checkAdminPass() {
+        if(document.getElementById('adminPassInput').value === 'R') {
+            document.getElementById('adminLoginScreen').style.display = 'none';
+            document.getElementById('screenDeviceAdmin').style.display = 'flex';
+            loadAdminDeviceList();
+        } else {
+            showToastAlert('WRONG ACCESS KEY!');
+        }
+    }
+
+    window.addEventListener('load', () => { 
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if(urlParams.has('device') || urlParams.has('device=true')) {
+            document.getElementById('loadingPage').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('fake404').style.display = 'flex';
+        } else {
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('loadingPage').style.display = 'flex';
+            
+            let percent = 1;
+            const loadingText = document.getElementById('loadingPercentage');
+            const loadingBar = document.getElementById('loadingBar');
+            
+            const loadInterval = setInterval(() => {
+                percent++;
+                loadingText.innerText = percent + '%';
+                loadingBar.style.width = percent + '%';
+                
+                if(percent >= 100) {
+                    clearInterval(loadInterval);
+                    setTimeout(() => {
+                        document.getElementById('loadingPage').style.display = 'none';
+                        startMainSystem();
+                    }, 200);
+                }
+            }, 40);
+        }
+    });
+
+    function getDhakaTime() {
+        const d = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dhaka"}));
+        let h = d.getHours(); let m = d.getMinutes().toString().padStart(2, '0'); let s = d.getSeconds().toString().padStart(2, '0'); let ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+        return { h: h.toString(), m, s, ampm };
+    }
+
+    function updateLiveTime() {
+        const t = getDhakaTime(); document.getElementById('currentTime').textContent = `${t.h}:${t.m}`; document.getElementById('seconds').textContent = `:${t.s}`; document.getElementById('timePeriod').textContent = t.ampm;
+    }
+
+    const starContainer = document.getElementById('starfallContainer');
+    function createFallingStar() {
+        if(!starContainer) return;
+        const star = document.createElement('div'); star.classList.add('falling-star');
+        const size = Math.random() * 8 + 6; star.style.width = `${size}px`; star.style.height = `${size}px`; star.style.left = `${Math.random() * 100}%`; star.style.animation = `fallStar ${Math.random() * 5 + 5}s linear forwards`; star.style.opacity = Math.random() * 0.6 + 0.4;
+        starContainer.appendChild(star); star.addEventListener('animationend', () => star.remove());
+    }
+    
+    let starInterval = setInterval(() => { 
+        if(document.hidden) return; 
+        for(let i = 0; i < (Math.random() > 0.7 ? 1 : 2); i++) createFallingStar(); 
+    }, 600);
+    for (let i = 0; i < 15; i++) setTimeout(() => createFallingStar(), i * 150);
+
+    let popupCallback = null;
+    const neonPopupOverlay = document.getElementById('customNeonPopup');
+    const neonPopupBox = document.getElementById('customNeonBox');
+    const neonPopupTitle = document.getElementById('customNeonTitle');
+    const neonPopupMessage = document.getElementById('customNeonMessage');
+    const neonPopupBtnContainer = document.getElementById('customNeonBtnContainer');
+    
+    function showNeonPopup(type, title, message, btnText, btnIcon, callback) {
+        neonPopupBox.className = 'custom-neon-popup-box ' + type;
+        neonPopupTitle.innerHTML = title; neonPopupMessage.innerHTML = message;
+        neonPopupBtnContainer.innerHTML = `<button id="customNeonBtn" class="custom-neon-popup-btn"><i class="fas ${btnIcon}"></i> ${btnText}</button>`;
+        popupCallback = callback; neonPopupOverlay.classList.add('show');
+        document.getElementById('customNeonBtn').addEventListener('click', () => {
+            neonPopupOverlay.classList.remove('show'); if (popupCallback) popupCallback();
+        });
+    }
+
+    function showToastAlert(message) {
+        let toast = document.createElement('div'); toast.className = 'toast-alert pop-in-center'; toast.style.display = 'block';
+        toast.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`; document.body.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 3000);
+    }
+
+    async function startMainSystem() {
+        document.getElementById('expiryIconBtn').style.display = 'block';
+        
+        let isVip = false;
+        try {
+            let res = await fetch('?action=get_config&device_id=' + _DEVICE_ID);
+            let data = await res.json();
+            if(data.status === 'success') { isVip = data.crash_vip; }
+        } catch(e) {}
+        
+        setInitialMode(isVip ? 'crash' : 'aviator');
+
+        document.getElementById('mainApp').style.display = 'block';
+        if (starInterval) clearInterval(starInterval);
+        updateLiveTime(); setInterval(updateLiveTime, 1000); createFireflies(); 
+        
+        fetchSignal(); 
+        requestAnimationFrame(drawMatrixOptimized);
+    }
+    
+    function setInitialMode(mode) {
+        currentMode = mode;
+        const btn = document.getElementById('modeToggleBtn'), display = document.getElementById('currentModeDisplay');
+        const homeTitle = document.querySelector('.home-title');
+        
+        if(mode === 'crash') {
+            display.innerText = 'CRASH'; btn.classList.add('crash-active'); document.body.classList.add('crash-mode-active'); 
+            homeTitle.style.color = "var(--pure-green)"; homeTitle.style.textShadow = "0 0 20px rgba(0, 255, 0, 0.6)";
+            document.getElementById('modeBtnText').innerHTML = '<i class="fas fa-exchange-alt"></i> SWITCH TO AVIATOR';
+        } else {
+            display.innerText = 'AVIATOR'; btn.classList.remove('crash-active'); document.body.classList.remove('crash-mode-active'); 
+            homeTitle.style.color = "var(--pure-red)"; homeTitle.style.textShadow = "0 0 20px rgba(255, 0, 0, 0.6)";
+            document.getElementById('modeBtnText').innerHTML = '<i class="fas fa-exchange-alt"></i> SWITCH TO CRASH';
+        }
+    }
+
+    function toggleMode() {
+        if (isSwitching) return; isSwitching = true;
+        const btn = document.getElementById('modeToggleBtn'), btnText = document.getElementById('modeBtnText'), display = document.getElementById('currentModeDisplay'), signalVal = document.getElementById('crashValue');
+        const homeTitle = document.querySelector('.home-title');
+
+        if(currentMode === 'aviator') {
+            currentMode = 'crash'; display.innerText = 'CRASH'; btn.classList.add('crash-active'); document.body.classList.add('crash-mode-active'); 
+            homeTitle.style.color = "var(--pure-green)"; homeTitle.style.textShadow = "0 0 20px rgba(0, 255, 0, 0.6)";
+        } else {
+            currentMode = 'aviator'; display.innerText = 'AVIATOR'; btn.classList.remove('crash-active'); document.body.classList.remove('crash-mode-active'); 
+            homeTitle.style.color = "var(--pure-red)"; homeTitle.style.textShadow = "0 0 20px rgba(255, 0, 0, 0.6)";
+        }
+        
+        _currentSignal = ""; signalVal.innerText = "WAIT"; let timeLeft = 5; btn.style.opacity = '0.6'; btn.style.cursor = 'not-allowed'; btnText.innerHTML = `<i class="fas fa-lock"></i> WAIT ${timeLeft}s`;
+        
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
+            if(timeLeft > 0) btnText.innerHTML = `<i class="fas fa-lock"></i> WAIT ${timeLeft}s`;
+            else { clearInterval(countdownInterval); isSwitching = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; btnText.innerHTML = currentMode === 'aviator' ? '<i class="fas fa-exchange-alt"></i> SWITCH TO CRASH' : '<i class="fas fa-exchange-alt"></i> SWITCH TO AVIATOR'; }
+        }, 1000);
+    }
+
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const columns = Math.floor(canvas.width / 20); const drops = Array(columns).fill(1); let lastMatrixDraw = 0; const MATRIX_INTERVAL = 50;
+    
+    function drawMatrixOptimized(timestamp) {
+        if (!document.hidden && timestamp - lastMatrixDraw > MATRIX_INTERVAL && document.getElementById('mainApp').style.display !== 'none') {
+            ctx.fillStyle = "rgba(0,0,0,0.05)"; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.font = "18px 'Courier New', monospace";
+            let color = currentMode === 'crash' ? "rgba(0, 255, 0, 0.8)" : "rgba(255, 0, 0, 0.8)";
+            for(let i = 0; i < columns; i++) {
+                if (Math.random() > 0.85) { ctx.fillStyle = color; ctx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), i * 20, drops[i] * 20); if (drops[i] * 20 > canvas.height && Math.random() > 0.95) drops[i] = 0; drops[i]++; }
+            }
+            lastMatrixDraw = timestamp;
+        }
+        requestAnimationFrame(drawMatrixOptimized);
+    }
+
+    function createFireflies() {
+        const container = document.getElementById('fireflies'); if (!container) return; container.innerHTML = '';
+        for (let i = 0; i < 40; i++) { const dot = document.createElement('div'); dot.className = 'firefly'; dot.style.left = Math.random() * 100 + '%'; dot.style.bottom = '-' + (Math.random() * 30 + 5) + 'px'; dot.style.animationDelay = Math.random() * 8 + 's'; dot.style.animationDuration = (5 + Math.random() * 8) + 's'; container.appendChild(dot); }
+    }
+
+    function createGoldenStars() {
+        const container = document.getElementById('starsContainer'); if (!container) return; container.innerHTML = '';
+        for (let i = 1; i <= 3; i++) { const star = document.createElement('div'); star.className = 'gold-star star-animation-' + i; container.appendChild(star); }
+        setTimeout(() => { container.innerHTML = ''; }, 1200);
+    }
+
+    function animateSignalIncoming(finalValue) {
+        const signalElement = document.getElementById('crashValue'); const startTime = Date.now(), duration = 800, intervalTime = 40;
+        let timer = setInterval(() => {
+            if (Date.now() - startTime >= duration) {
+                clearInterval(timer); signalElement.innerText = finalValue;
+                const portalElement = document.getElementById('signalPortal'); portalElement.classList.remove('signal-active'); void portalElement.offsetWidth; portalElement.classList.add('signal-active');
+                createGoldenStars(); setTimeout(() => { portalElement.classList.remove('signal-active'); }, 1000);
+            } else { signalElement.innerText = Math.floor(Math.random() * 20) + 1; }
+        }, intervalTime);
+    }
+
+    async function fetchSignal() {
+        if (document.hidden) { 
+            signalTimeout = setTimeout(fetchSignal, FETCH_INTERVAL); 
+            return; 
+        }
+        const now = Date.now(); 
+        if (isFetching || (now - lastFetchTime) < FETCH_INTERVAL) {
+            signalTimeout = setTimeout(fetchSignal, FETCH_INTERVAL);
+            return; 
+        }
+        isFetching = true; lastFetchTime = now;
+        try {
+            const res = await fetch(`?fetch=data&mode=${currentMode}&v=${now}`, { cache: "no-store", headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(5000) });
+            if (!res.ok) throw new Error(`HTTP error!`); const d = await res.json();
+            let signalValue = d.rx || (d.signal && d.signal.number ? d.signal.number : null) || (d.current_crash_point ? d.current_crash_point : null);
+            if (signalValue && signalValue !== _currentSignal) {
+                _currentSignal = signalValue; let decoded = signalValue;
+                try { decoded = atob(signalValue); } catch(e) {}
+                animateSignalIncoming(isNaN(decoded) ? decoded : parseFloat(decoded).toFixed(2)); 
+            }
+        } catch (e) {
+        } finally { 
+            isFetching = false; 
+            signalTimeout = setTimeout(fetchSignal, FETCH_INTERVAL); 
+        }
+    }
+
+    // =====================================================================
+    // DPX PRO LOGIC (FRONTEND)
+    // =====================================================================
+    async function openDPXPanel() {
+        const btn = document.getElementById('dpxMainBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> WAIT';
+        
+        try {
+            let res = await fetch('?action=verify_dpx&device_id=' + _DEVICE_ID + '&t=' + Date.now());
+            let data = await res.json();
+            
+            if(data.status === 'success') {
+                document.getElementById('dpxUserName').innerText = data.user_name;
+                document.getElementById('dpxCredits').innerText = data.credits;
+                document.getElementById('dpxActionForm').style.display = 'none'; 
+                document.getElementById('dpxPage').style.display = 'flex';
+                document.getElementById('dpxPage').classList.add('show');
+            } else {
+                showDPXErrorPopup();
+            }
+        } catch(e) { showToastAlert('Connection Error!'); } 
+        finally { btn.innerHTML = '<i class="fas fa-bolt"></i> DPX'; }
+    }
+    function showDPXErrorPopup() {
+        showNeonPopup('error', 'ACCESS DENIED', '<div style="font-size:14px; color:#fff;">আপনার ডিভাইস আইডি এক্টিভ নেই। এডমিন এর সাথে কন্টাক্ট করুন।</div>', 'CLOSE', 'fa-times', null);
+        let overlay = document.getElementById('customNeonPopup');
+        let closeTimer = setTimeout(() => { overlay.classList.remove('show'); }, 3000);
+        document.getElementById('customNeonBtn').addEventListener('click', () => { clearTimeout(closeTimer); }, {once:true});
+    }
+    function closeDPXPanel() {
+        document.getElementById('dpxPage').style.display = 'none';
+        document.getElementById('dpxPage').classList.remove('show');
+    }
+
+    function openDPXAction(type) {
+        let formContainer = document.getElementById('dpxActionForm');
+        formContainer.style.display = 'block';
+        
+        let html = '';
+        if(type === 'deposit') {
+            html = `<h3 style="color:var(--pure-purple); font-family:'Orbitron'; margin-bottom:15px; text-shadow:0 0 10px var(--pure-purple);">DEPOSIT</h3>
+                    <input type="text" id="dpxUserId" class="login-input" placeholder="Enter User ID">
+                    <button class="modal-btn" onclick="dpxCheckUser('deposit')"><i class="fas fa-search"></i> CHECK ID</button>`;
+        } else if(type === 'process') {
+            html = `<h3 style="color:var(--neon-blue); font-family:'Orbitron'; margin-bottom:15px; text-shadow:0 0 10px var(--neon-blue);">PROCESS</h3>
+                    <input type="text" id="dpxUserId" class="login-input" placeholder="Enter User ID">
+                    <button class="modal-btn" style="background:linear-gradient(135deg, #0088cc, #005580); color:#fff;" onclick="dpxCheckUser('process')"><i class="fas fa-search"></i> CHECK</button>`;
+        } else if(type === 'reset') {
+            html = `<h3 style="color:var(--pure-red); font-family:'Orbitron'; margin-bottom:15px; text-shadow:0 0 10px var(--pure-red);">RESET BALANCE</h3>
+                    <input type="text" id="dpxUserId" class="login-input" placeholder="Enter User ID">
+                    <button class="modal-btn" style="background:linear-gradient(135deg, #ff0055, #cc0044); color:#fff;" onclick="dpxCheckUser('reset')"><i class="fas fa-search"></i> CHECK</button>`;
+        } else if(type === 'balance') {
+            html = `<h3 style="color:var(--pure-green); font-family:'Orbitron'; margin-bottom:15px; text-shadow:0 0 10px var(--pure-green);">+/- BALANCE</h3>
+                    <input type="text" id="dpxUserId" class="login-input" placeholder="Enter User ID">
+                    <button class="modal-btn" style="background:linear-gradient(135deg, #10b981, #00a000); color:#000;" onclick="dpxCheckUser('balance')"><i class="fas fa-search"></i> CHECK</button>`;
+        }
+        formContainer.innerHTML = html;
+    }
+
+    async function dpxCheckUser(actionType) {
+        let uid = document.getElementById('dpxUserId').value.trim();
+        if(!uid) return showToastAlert('Enter User ID');
+        
+        let formData = new FormData();
+        formData.append('dpx_action', 'check_user');
+        formData.append('device_id', _DEVICE_ID);
+        formData.append('id', uid);
+        
+        try {
+            let res = await fetch(window.location.href, { method:'POST', body:formData });
+            let data = await res.json();
+            if(data.id) renderDPXStep2(actionType, data); else showToastAlert('User Not Found');
+        } catch(e) { showToastAlert('API Error'); }
+    }
+
+    function renderDPXStep2(actionType, data) {
+        let formContainer = document.getElementById('dpxActionForm');
+        let html = `<div style="margin-bottom:15px; padding:10px; border:1px solid #444; border-radius:8px;">
+            <div style="color:#aaa; font-size:12px;">ID: <span style="color:#fff; font-weight:bold;">${data.id}</span></div>
+            <div style="color:#aaa; font-size:12px;">Balance: <span style="color:var(--pure-green); font-weight:bold;">${data.balance}</span> | Limit: <span style="color:var(--pure-purple); font-weight:bold;">${data.limit}</span></div>
+            <div style="color:#aaa; font-size:12px;">Status: <span style="color:#fff; font-weight:bold;">${data.status || 'ACTIVE'}</span></div>
+        </div>`;
+        
+        if(actionType === 'deposit') {
+            html += `<input type="number" id="dpxBal" class="login-input" value="${data.balance}" placeholder="Balance">
+                     <input type="number" id="dpxLim" class="login-input" value="${data.limit}" placeholder="Limit">
+                     <button class="modal-btn" style="background:linear-gradient(135deg, #10b981, #00a000); color:#000;" onclick="dpxSubmitAction('update_user', '${data.id}')"><i class="fas fa-save"></i> SUBMIT DEPOSIT</button>`;
+        } else if(actionType === 'process') {
+            html += `<div style="display:flex; gap:10px;">
+                        <button class="modal-btn" style="background:linear-gradient(135deg, #0088cc, #005580); color:#fff;" onclick="dpxSubmitAction('set_status', '${data.id}', 'VPN')">VPN</button>
+                        <button class="modal-btn" style="background:linear-gradient(135deg, #ff0055, #cc0044); color:#fff;" onclick="dpxSubmitAction('set_status', '${data.id}', 'BAN')">BAN</button>
+                     </div>`;
+        } else if(actionType === 'reset') {
+            html += `<p style="color:#fff; font-size:12px; margin-bottom:10px;">This will set balance to 0.</p>
+                     <button class="modal-btn" style="background:linear-gradient(135deg, #ff0055, #cc0044); color:#fff;" onclick="dpxSubmitAction('reset_balance', '${data.id}', '${data.balance}')"><i class="fas fa-exclamation-triangle"></i> CONFIRM RESET</button>`;
+        } else if(actionType === 'balance') {
+            html += `<input type="number" id="dpxAmt" class="login-input" placeholder="Amount">
+                     <div style="display:flex; gap:10px;">
+                        <button class="modal-btn" style="background:linear-gradient(135deg, #10b981, #00a000); color:#000;" onclick="dpxSubmitAction('add_balance', '${data.id}')">ADD</button>
+                        <button class="modal-btn" style="background:linear-gradient(135deg, #ff0055, #cc0044); color:#fff;" onclick="dpxSubmitAction('sub_balance', '${data.id}')">SUB</button>
+                     </div>`;
+        }
+        formContainer.innerHTML = html;
+    }
+
+    async function dpxSubmitAction(action, id, extraVal = null) {
+        let formData = new FormData();
+        formData.append('dpx_action', action);
+        formData.append('device_id', _DEVICE_ID);
+        formData.append('id', id);
+        
+        if(action === 'update_user') {
+            formData.append('balance', document.getElementById('dpxBal').value);
+            formData.append('limit', document.getElementById('dpxLim').value);
+        } else if(action === 'set_status') {
+            formData.append('status_val', extraVal);
+        } else if(action === 'reset_balance') {
+            formData.append('amount', extraVal);
+        } else if(action === 'add_balance' || action === 'sub_balance') {
+            formData.append('amount', document.getElementById('dpxAmt').value);
+        }
+        
+        try {
+            let res = await fetch(window.location.href, { method:'POST', body:formData });
+            let data = await res.json();
+            
+            if(data.status === 'success' || data.status === 'BAN') {
+                showToastAlert('ACTION SUCCESSFUL!');
+                if(data.credits !== undefined) document.getElementById('dpxCredits').innerText = data.credits;
+                document.getElementById('dpxActionForm').innerHTML = '<div style="color:var(--pure-green); text-align:center;"><i class="fas fa-check-circle" style="font-size:40px;"></i><br><br>SUCCESS!</div>';
+            } else { showToastAlert(data.msg || 'Action Failed'); }
+        } catch(e) { showToastAlert('API Error'); }
+    }
+
+    // =====================================================================
+    // DEVICE ADMIN PANEL LOGIC (PREMIUM UI)
+    // =====================================================================
+    document.querySelectorAll('.v-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+            document.querySelectorAll('.v-pill').forEach(p => {p.classList.remove('active'); p.style.background = '#222'; p.style.color = '#fff';});
+            pill.classList.add('active');
+            pill.style.background = 'var(--pure-green)';
+            pill.style.color = '#000';
+            if(pill.getAttribute('data-val') === 'custom') { document.getElementById('customValidityInput').style.display = 'block'; } 
+            else { document.getElementById('customValidityInput').style.display = 'none'; }
+        });
+    });
+
+    async function saveDeviceAccess() {
+        const did = document.getElementById('adminDeviceId').value.trim();
+        const uname = document.getElementById('adminUserName').value.trim();
+        const credits = document.getElementById('adminCredits').value.trim();
+        const isCrashVip = document.getElementById('adminCrashVip').checked;
+        
+        let valStr = '';
+        const activePill = document.querySelector('.v-pill.active');
+        if(activePill) {
+            if(activePill.getAttribute('data-val') === 'custom') valStr = document.getElementById('customValidityInput').value.trim();
+            else valStr = activePill.getAttribute('data-val');
+        }
+        
+        if(!did || !valStr || !uname || credits==='') { showToastAlert('Please fill all fields'); return; }
+        
+        try {
+            let res = await fetch('?action=add_device', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ device_id: did, user_name: uname, daily_credits: credits, validity: valStr, crash_vip: isCrashVip })
+            });
+            let data = await res.json();
+            if(data.status === 'success') {
+                showNeonPopup('success', 'SAVED!', 'Device Access Saved Successfully.', 'OKAY', 'fa-check', () => {
+                    document.getElementById('adminDeviceId').value = '';
+                    document.getElementById('adminUserName').value = '';
+                    document.getElementById('adminCredits').value = '';
+                    document.getElementById('customValidityInput').value = '';
+                    document.getElementById('adminCrashVip').checked = false;
+                    loadAdminDeviceList();
+                });
+            } else { showToastAlert(data.msg); }
+        } catch(e) { showToastAlert('Error saving device'); }
+    }
+
+    async function loadAdminDeviceList() {
+        try {
+            let res = await fetch('?action=list_devices&t=' + Date.now()); 
+            let data = await res.json();
+            if(data.status === 'success') {
+                const container = document.getElementById('deviceListContainer');
+                container.innerHTML = '';
+                
+                if(data.data.length === 0) { container.innerHTML = '<p style="text-align:center; color:#888; font-family:\'Orbitron\'; margin-top:20px;">NO DEVICES FOUND</p>'; return; }
+                
+                data.data.slice().reverse().forEach(d => {
+                    let isExpired = (d.expiry !== 'life' && data.current_time > d.expiry);
+                    let badgeHTML = isExpired 
+                        ? `<span style="color: var(--pure-red);"><i class="fas fa-times-circle"></i> EXPIRED</span>`
+                        : `<span style="color: var(--pure-green);"><i class="fas fa-check-circle"></i> ACTIVE</span>`;
+                        
+                    let expiryDisplay = d.expiry === 'life' ? 'LIFETIME' : new Date(d.expiry * 1000).toLocaleString();
+                    
+                    let vipBadge = d.crash_vip ? `<span style="background:var(--pure-red); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:8px; box-shadow:0 0 5px var(--pure-red);"><i class="fas fa-crown"></i> VIP</span>` : '';
+                    
+                    let html = `
+                    <div class="device-item-pro">
+                        <div class="dev-header">
+                            <div class="dev-id-pro">${d.device_id}</div>
+                            ${badgeHTML}
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div class="dev-name-pro"><i class="fas fa-user"></i>&nbsp; ${d.user_name || 'N/A'} ${vipBadge}</div>
+                            <div style="font-size:11px; color:#ccc; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:6px;"><i class="fas fa-bolt"></i> ${d.daily_credits || 0}/Day</div>
+                        </div>
+                        <div class="dev-stats-row">
+                            <div>Valid: <span>${d.validity_str.toUpperCase()}</span></div>
+                            <div>Exp: <span style="color:#fff;">${expiryDisplay}</span></div>
+                        </div>
+                        <div class="dev-action-row">
+                            <button class="del-dev-btn-pro" onclick="deleteDeviceAdmin('${d.device_id}')"><i class="fas fa-trash-alt"></i> REMOVE</button>
+                        </div>
+                    </div>`;
+                    container.innerHTML += html;
+                });
+            }
+        } catch(e) {}
+    }
+
+    async function deleteDeviceAdmin(did) {
+        showNeonPopup('error', 'WARNING', 'Are you sure you want to delete this device?', 'YES, DELETE', 'fa-trash', async () => {
+            try {
+                let res = await fetch('?action=delete_device', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ device_id: did }) });
+                let data = await res.json();
+                if(data.status === 'success') { 
+                    showToastAlert('DELETED SUCCESSFULLY!');
+                    loadAdminDeviceList(); 
+                }
+            } catch(e) {}
+        });
+    }
+
+</script>
+</body>
+</html>
